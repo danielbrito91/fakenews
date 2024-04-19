@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "fakenews"
+version = "0.1.0"
+description = ""
+authors = ["danielbrito91 <danieloliveiradebrito@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+polars = "^0.20.21"
+xlsx2csv = "^0.8.2"
+transformers = "^4.40.0"
+torch = "^2.2.2"
+peft = "^0.10.0"
+datasets = "^2.18.0"
+pyarrow = "^15.0.2"
+scikit-learn = "^1.4.2"
+python-dotenv = "^1.0.1"
+accelerate = "^0.29.3"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
