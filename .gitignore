@@ -5,6 +5,9 @@
 output/*
 models/*
 
+# Raw data
+data/fakebr-corpus/*
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
