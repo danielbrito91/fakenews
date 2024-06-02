@@ -45,3 +45,16 @@ def read_fakebr_corpus(
     return pl.DataFrame(dict(id=ids, texts=texts)).with_columns(
         pl.lit(is_fake).alias("label")
     )
+
+
+def read_fake_recogna(
+        fake_recogna_path: str = "data/fakerecogna/FakeRecogna.xlsx"
+) -> pl.DataFrame:
+
+    return (pl.read_excel(fake_recogna_path)
+        .select(["Noticia", "Classe"])
+        .rename({"Noticia": "text", "Classe": "label"})
+        )
+
+    
+    
