@@ -1,5 +1,6 @@
 import glob
 import os
+import pandas as pd
 import pathlib
 from typing import Literal
 
@@ -48,13 +49,63 @@ def read_fakebr_corpus(
 
 
 def read_fake_recogna(
-        fake_recogna_path: str = "data/fakerecogna/FakeRecogna.xlsx"
+    fake_recogna_path: str = "data/fakerecogna/FakeRecogna.xlsx",
 ) -> pl.DataFrame:
-
-    return (pl.read_excel(fake_recogna_path)
+    return (
+        pl.read_excel(fake_recogna_path)
         .select(["Noticia", "Classe"])
         .rename({"Noticia": "text", "Classe": "label"})
-        )
+    )
 
-    
-    
+
+def read_fake_true_br(
+    url="https://raw.githubusercontent.com/jpchav98/FakeTrue.Br/main/FakeTrueBr_corpus.csv",
+):
+    df = pl.from_pandas(pd.read_csv(url))
+
+    # Mesmo comprimento para fake e true
+
+    df = (
+        df.with_columns(pl.col("fake").str.strip(), pl.col("true").str.strip())
+        .with_columns(
+            pl.col("fake").str.len_chars().alias("fake_len"),
+            pl.col("true").str.len_chars().alias("true_len"),
+        )
+        .with_columns(
+            pl.min_horizontal([pl.col("fake_len"), pl.col("true_len")]).alias("min_len")
+        )
+        .with_columns(
+            pl.col("fake").str.slice(0, length=pl.col("min_len")).alias("fake"),
+            pl.col("true").str.slice(0, length=pl.col("min_len")).alias("true"),
+        )
+        .with_row_count("id")
+    )
+
+    assert (
+        df.with_columns(
+            (pl.col("fake").str.len_chars() - pl.col("true").str.len_chars()).alias(
+                "dif"
+            )
+        )
+        .filter(pl.col("dif") != 0)
+        .shape[0]
+        == 0
+    )
+
+    fake = (
+        df.select(["fake", "id"])
+        .with_columns(pl.lit(1).alias("label"))
+        .rename({"fake": "text"})
+    )
+    true = (
+        df.select(["true", "id"])
+        .with_columns(pl.lit(0).alias("label"))
+        .rename({"true": "text"})
+    )
+
+    df = pl.concat([fake, true])
+
+    # Existe um id para cada notícia fake e true
+    assert df.shape[0] == (df["id"].max() + 1) * 2
+
+    return df

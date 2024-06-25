@@ -3,8 +3,12 @@ import json
 import datasets
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.model_selection import train_test_split
-from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
-                          Trainer, TrainingArguments)
+from transformers import (
+    AutoModelForSequenceClassification,
+    AutoTokenizer,
+    Trainer,
+    TrainingArguments,
+)
 
 from fakenews.read_data import read_fake_recogna
 
@@ -17,9 +21,10 @@ def load_model_and_tokenizer(model_name: str):
 
 def compute_metrics(pred):
     acc = accuracy_score(pred.label_ids, pred.predictions.argmax(1))
-    clf_report = classification_report(pred.label_ids, pred.predictions.argmax(1), output_dict=True)
-    return {"accuracy": acc,
-            "clf_report": clf_report}
+    clf_report = classification_report(
+        pred.label_ids, pred.predictions.argmax(1), output_dict=True
+    )
+    return {"accuracy": acc, "clf_report": clf_report}
 
 
 class FakeNewsTrainer:
@@ -62,26 +67,23 @@ class FakeNewsTrainer:
             compute_metrics=compute_metrics,
         )
 
+
 if __name__ == "__main__":
-
-
     # Read data
     df = read_fake_recogna().to_pandas()
 
     # Split data
-    train_full, test = train_test_split(df,
-                                test_size=0.2,
-                                random_state=42,
-                                shuffle=True,
-                                stratify=df["label"]
-                                )
+    train_full, test = train_test_split(
+        df, test_size=0.2, random_state=42, shuffle=True, stratify=df["label"]
+    )
 
-    train, val = train_test_split(train_full,
-                                test_size=0.2,
-                                random_state=42,
-                                shuffle=True,
-                                stratify=train_full["label"]
-                                )
+    train, val = train_test_split(
+        train_full,
+        test_size=0.2,
+        random_state=42,
+        shuffle=True,
+        stratify=train_full["label"],
+    )
 
     ds = datasets.DatasetDict()
     ds["train"] = datasets.Dataset.from_pandas(train.reset_index(drop=True))

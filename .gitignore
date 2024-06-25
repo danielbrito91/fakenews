@@ -9,6 +9,7 @@ models/*
 
 # Raw data
 data/fakebr-corpus/*
+data/fakepedia-corpus/*
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
